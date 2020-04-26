@@ -90,15 +90,15 @@ def getLikelyhoods(alpha):
     return likelyhoods, prob
 
 
-def classify(valid_data, valid_labs, likelyhoods):
+def classify(data, labs, likelyhoods):
     i = -1
     correct = 0
     pred_list = []
 
-    for line in valid_data:
+    for line in data:
         i += 1
         sums = [0,0]
-        for j, lab in enumerate(set(valid_labs)):
+        for j, lab in enumerate(set(labs)):
             sums[j] = prob[j]
             for word in line:
                 if word in vocabulary:
@@ -110,7 +110,7 @@ def classify(valid_data, valid_labs, likelyhoods):
         else:
             pred = "positive"
 
-        if(pred == valid_labs[i]):
+        if(pred == labs[i]):
             correct += 1
         pred_list.append(pred)
     return pred_list, correct
@@ -143,7 +143,7 @@ likelyhoods, prob = getLikelyhoods(alpha)
 pred_list, correct = classify(valid_data, valid_labs, likelyhoods)
 
 # Print out the percent correct on the validation set
-print("Percent Correct: " + str(round(correct/len(valid_labs)*100),2))
+print("Percent Correct: " + str(round(correct/len(valid_labs)*100,2)))
 
 # Print the list of predictions to an output file
 with open('test_predicitons.csv', 'w') as outfile:
