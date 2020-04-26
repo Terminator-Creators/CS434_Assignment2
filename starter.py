@@ -100,8 +100,6 @@ def getLabs():
             for word in line:
                 if(word in vocabulary):
                     wcList[0].append(word)
-    with open("out", "w") as out:
-        out.write(str(wcList))
     return wcList
 
 
