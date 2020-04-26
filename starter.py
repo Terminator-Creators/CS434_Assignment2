@@ -2,6 +2,9 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 import re
 import math
+import time
+
+start = time.time()
 
 # Function to make a 1D list of sentences into a 2D list of words
 def create_list(aList):
@@ -76,6 +79,7 @@ likelyhoods = []
 mylist = [[],[]]
 prob = []
 
+print('starting part1')
 # Go through each review and add each word to a list depending if the review is positive of negative
 for i, lab in enumerate(set(training_labs)):
     prob.append(math.log(training_labs.count(lab) / len(training_labs)))
@@ -91,18 +95,18 @@ for i, lab in enumerate(set(training_labs)):
                 if(word in vocabulary):
                     mylist[0].append(word)
 
+    print('total_words')
+    # Get the total number of words from the vocabulary
+    total_words = 0
+    for word in vocabulary:
+        total_words += mylist[i].count(word)
 
-
-        # Get the total number of words from the vocabulary
-        total_words = 0
-        for word in vocabulary:
-            total_words += mylist[i].count(word)
-
-        # Compute the likelyhoods of each word in the vocabulary
-        likelyhoods.clear()
-        for word in vocabulary:
-            count = mylist.count(word)
-            likelyhoods.append(math.log((count + alpha) / (total_words + alpha * len(vocabulary))))
+    print('likelyhoods')
+    # Compute the likelyhoods of each word in the vocabulary
+    likelyhoods.clear()
+    for word in vocabulary:
+        count = mylist.count(word)
+        likelyhoods.append(math.log((count + alpha) / (total_words + alpha * len(vocabulary))))
 
 # For each review, grab the likelyhood that word is in a positive review and sum them
 # Not sure on this part, definitely need to understand this better
@@ -110,6 +114,7 @@ i = -1
 correct = 0
 pred_list = []
 
+print('starting part 2')
 for line in valid_data:
     i += 1
     sums = [0]*2
@@ -129,5 +134,7 @@ for line in valid_data:
         correct += 1
     pred_list.append(pred)
     
+end = time.time()
 print("Percent Correct: " + str(correct/len(valid_labs)) + "\n\n")
+print("time taken: {}".format(end - start))
 print(pred_list)
