@@ -108,31 +108,6 @@ def classify(data, likelyhoods, labs=None,):
         pred_list.append(pred)
     return pred_list, correct
 
-
-
-
-
-# def classify(data, labs, likelyhoods):
-#     pred = -1
-#     i = 0
-#     correct = 0
-#     pred_list = []
-#     vector_validate = np.copy(vector[30000:40000])
-#     for item in vector_validate:
-#         spam_value = (item.T*spam_likelyhood).T.sum() + prob[0]
-#         non_spam_value = (item.T*non_spam_likelyhood).T.sum() + prob[1]
-
-#         if(spam_value > non_spam_value):
-#             pred = "positive"
-#         else:
-#             pred = "negative"
-#         if(pred == labs[i]):
-#             correct += 1
-#         pred_list.append(pred)
-#     return pred_list, correct
-
-
-
 # Importing the dataset and creating the three distinct datasets
 imdb_data  = pd.read_csv('IMDB.csv', delimiter=',')
 label_data = pd.read_csv('IMDB_labels.csv', delimiter=',') 
