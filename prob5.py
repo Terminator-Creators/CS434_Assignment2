@@ -106,7 +106,7 @@ def create_vocab(imdb_data):
 
     return pred_list, correct
 
-start = time.time()
+# start = time.time()
 
 # Importing the dataset and creating the three distinct datasets
 imdb_data  = pd.read_csv('IMDB.csv', delimiter=',')
@@ -143,6 +143,6 @@ with open('test-prediciton3.csv', 'w') as outfile:
     for line in pred_list:
         outfile.write(line + "\n")
 
-end = time.time()
+# end = time.time()
 
-print(end-start)
+# print(end-start)
