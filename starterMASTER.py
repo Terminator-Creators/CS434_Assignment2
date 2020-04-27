@@ -23,8 +23,6 @@ def clean_text(text):
     text = re.sub(r"\\", "", text)
     text = re.sub(r"\'", "", text)
     text = re.sub(r"\"", "", text)
-    #pattern = r'[^a-zA-z0-9\s]'
-    #text = re.sub(pattern, '', text)
 
     # convert text to lowercase
     text = text.strip().lower()
@@ -44,7 +42,12 @@ def create_vocab(imdb_data, alpha):
         stop_words="english",
         preprocessor=clean_text,
         max_features=2000,
+        max_df=1.0,
+        min_df=1,
     )
+
+    # fit the vectorizer on the text
+    # vectorizer.fit(imdb_data['review'])
 
     # This bit grabs the total word counts for positive and negative reviews, should speed up calc time
     vector = vectorizer.fit_transform(imdb_data['review']).toarray()
@@ -66,33 +69,68 @@ def create_vocab(imdb_data, alpha):
     spam_likelyhood = []
     non_spam_likelyhood = []
 
+    # get the vocabulary
+    inv_vocab = {v: k for k, v in vectorizer.vocabulary_.items()}
+    vocabulary = [inv_vocab[i] for i in range(len(inv_vocab))]
+
 
     for value in total_spam:
-        spam_likelyhood.append(np.log((value + alpha) / (spam_total + alpha * len(vector[0]))))
+        spam_likelyhood.append(np.log((value + alpha) / (spam_total + alpha * len(vocabulary))))
 
     for value in total_non_spam:
-        non_spam_likelyhood.append(np.log((value + alpha) / (non_spam_total + alpha * len(vector[0]))))
+        non_spam_likelyhood.append(np.log((value + alpha) / (non_spam_total + alpha * len(vocabulary))))
 
+    return vocabulary, [non_spam_likelyhood, spam_likelyhood]
 
-    pred = -1
-    i = 0
+# Overloaded function 
+def classify(data, likelyhoods, labs=None,):
+    i = -1
     correct = 0
     pred_list = []
-    vector_validate = np.copy(vector[30000:40000])
-    for item in vector_validate:
-        spam_value = (item.T*spam_likelyhood).T.sum() + prob[0]
-        non_spam_value = (item.T*non_spam_likelyhood).T.sum() + prob[1]
 
-        if(spam_value > non_spam_value):
-            pred = "positive"
-        else:
-            pred = "negative"
-        if(pred == valid_labs[i]):
-            correct += 1
-        pred_list.append(pred)
+    for line in data:
         i += 1
+        sums = [0,0]
+        for j, lab in enumerate(["negative", "positive"]):
+            sums[j] = prob[j]
+            for word in line:
+                if word in vocabulary:
+                    sums[j] += likelyhoods[j][vocabulary.index(word)]
+        pred = -1
+        if(sums[0] >= sums[1]):
+            pred = "negative"
+        else:
+            pred = "positive"
 
+        if(labs is not None):
+            if(pred == labs[i]):
+                correct += 1
+        pred_list.append(pred)
     return pred_list, correct
+
+
+
+
+
+# def classify(data, labs, likelyhoods):
+#     pred = -1
+#     i = 0
+#     correct = 0
+#     pred_list = []
+#     vector_validate = np.copy(vector[30000:40000])
+#     for item in vector_validate:
+#         spam_value = (item.T*spam_likelyhood).T.sum() + prob[0]
+#         non_spam_value = (item.T*non_spam_likelyhood).T.sum() + prob[1]
+
+#         if(spam_value > non_spam_value):
+#             pred = "positive"
+#         else:
+#             pred = "negative"
+#         if(pred == labs[i]):
+#             correct += 1
+#         pred_list.append(pred)
+#     return pred_list, correct
+
 
 
 # Importing the dataset and creating the three distinct datasets
@@ -113,12 +151,15 @@ alpha = 1
 prob = [np.log(training_labs.count("negative") / len(training_labs)), np.log(training_labs.count("positive") / len(training_labs))]
 
 # Get the vocabulary and two lists of ints of word occurances plus the likelyhoods
-pred_list, correct = create_vocab(imdb_data, alpha)
+vocabulary, likelyhoods = create_vocab(imdb_data, alpha)
+
+# Run the classification on the validation data
+pred_list, correct = classify(valid_data, likelyhoods, valid_labs)
 
 # Print out the percent correct on the validation set
-print("Percent Correct: " + str(round(correct/len(valid_labs)*100,2)))
+print("Validation Percent Correct: " + str(round(correct/len(valid_labs)*100,2)))
 
 # Print the list of predictions to an output file
-with open('test_predicitons.csv', 'w') as outfile:
+with open('test_predictions.csv', 'w') as outfile:
     for line in pred_list:
         outfile.write(line + "\n")
