@@ -38,7 +38,7 @@ def clean_text(text):
 
 
 # Function to create the vocab from the imdb_data
-def create_vocab(imdb_data, alpha):
+def create_vocab(imdb_data, alpha, vec_lwr, vec_upr):
     # this vectorizer will skip stop words
     vectorizer = CountVectorizer(
         stop_words="english",
@@ -78,7 +78,10 @@ def create_vocab(imdb_data, alpha):
     i = 0
     correct = 0
     pred_list = []
-    vector_validate = np.copy(vector[30000:40000])
+    # Setting the vec_lwr and vec_upr will let you choose which set to use:
+    # vec_lwr = 30000 and vec_upr = 40000 gives validation
+    # vec_lwr = 40000 and vec_upr = 50000 gives testing
+    vector_validate = np.copy(vector[vec_lwr:vec_upr])
     for item in vector_validate:
         spam_value = (item.T*spam_likelyhood).T.sum() + prob[0]
         non_spam_value = (item.T*non_spam_likelyhood).T.sum() + prob[1]
@@ -87,8 +90,9 @@ def create_vocab(imdb_data, alpha):
             pred = "positive"
         else:
             pred = "negative"
-        if(pred == valid_labs[i]):
-            correct += 1
+        if(vec_lwr == 30000):
+            if(pred == valid_labs[i]):
+                correct += 1
         pred_list.append(pred)
         i += 1
 
@@ -113,12 +117,12 @@ alpha = 1
 prob = [np.log(training_labs.count("negative") / len(training_labs)), np.log(training_labs.count("positive") / len(training_labs))]
 
 # Get the vocabulary and two lists of ints of word occurances plus the likelyhoods
-pred_list, correct = create_vocab(imdb_data, alpha)
+pred_list, correct = create_vocab(imdb_data, alpha, 30000, 40000)
 
 # Print out the percent correct on the validation set
 print("Percent Correct: " + str(round(correct/len(valid_labs)*100,2)))
 
 # Print the list of predictions to an output file
-with open('test_predicitons.csv', 'w') as outfile:
+with open('test_predictions.csv', 'w') as outfile:
     for line in pred_list:
         outfile.write(line + "\n")
