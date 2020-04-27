@@ -129,4 +129,7 @@ pred_list, correct = create_vocab(imdb_data, alpha, 40000, 50000)
 # Print the list of predictions of the test set to an output file
 with open('test-prediction1.csv', 'w') as outfile:
     for line in pred_list:
-        outfile.write(line + "\n")
+        if(line == 'negative'):
+            outfile.write('0' + "\n")
+        else:
+            outfile.write('1' + "\n")
