@@ -5,14 +5,14 @@ Each problem in the assignment is self-contained in the .py file of it's problem
 
 ## Packages:
   To run this code, the following packages need to be installed for python3:
-    * pandas
-    * sklearn.feature_extraction.text
-    * re
-    * math
-    * time
-    * numpy
-    * csv
-    * matplotlib.pyplot
+    *pandas
+    *sklearn.feature_extraction.text
+    *re
+    *math
+    *time
+    *numpy
+    *csv
+    *matplotlib.pyplot
 
 ## How to run:
   1. N/A (no need to run)
