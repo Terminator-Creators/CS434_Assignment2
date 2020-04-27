@@ -139,7 +139,7 @@ plt.clf()
 pred_list, correct = create_vocab(imdb_data, 1.0, 40000, 50000)
 
 # Print the list of predictions to an output file
-with open('test_predictions2.csv', 'w') as outfile:
+with open('test-prediction2.csv', 'w') as outfile:
     for line in pred_list:
         outfile.write(str(line))
         if(not(line == pred_list[:-1])):
